@@ -1,6 +1,6 @@
 import { app } from "../server";
-import { estoque } from "../models/estoque";
-import { estoqueRepository } from "../repository/estoqueRepository";
+import { estoque } from "../models/Estoque";
+import { estoque } from "../repository/Estoque";
 
 export function estoqueController() {
   const repository = new estoqueRepository();

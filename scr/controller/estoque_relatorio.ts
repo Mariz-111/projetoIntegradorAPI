@@ -1,8 +1,9 @@
 import { app } from "../server";
 import { estoque_relatorio } from "../models/estoque_relatorio";
+import { EstoqueRelatorioRepository } from "../repository/Estoque";
 
 export function estoqueRelatorioController() {
-  const repository = new estoque_relatorio();
+  const repository = new EstoqueRelatorioRepository();
 
   app.get("/estoque-relatorios", (req, res) => {
     const { registro_movimentacao } = req.query;

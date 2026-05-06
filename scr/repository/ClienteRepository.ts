@@ -22,7 +22,6 @@ export class ClienteRepository {
         return db.prepare("SELECT * FROM clientes").all() as Cliente[];
     }
 
-    // Busca um Cliente pelo nome na tabela "clientes"
     buscarPorNome(nome: string): Cliente | null {
         return db.prepare("SELECT * FROM cliente WHERE nome = ?").get(nome) as Cliente | null;
     }

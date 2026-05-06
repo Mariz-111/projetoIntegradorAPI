@@ -1,86 +1,63 @@
-import { Router, Request, Response } from "express";
-import { EnderecoRepository } from "../repository/EnderecoRepository";
+import { app } from "../server";
+import { EnderecoRepository } from "../Repositories/Endereco";
 
-const router = Router();
-const enderecoRepo = new EnderecoRepository();
+export function EnderecoControllers() {
+  const repository = new EnderecoRepository();
 
-router.post("/enderecos", (req: Request, res: Response) => {
-    try {
-        const { cliente_id, rua, numero, bairro, cidade, estado, cep, complemento } = req.body;
+  app.get("/enderecos", (req, res) => {
+    const { cliente_id } = req.query;
 
-        if (!cliente_id || !rua || !numero || !bairro || !cidade || !estado || !cep) {
-            res.status(400).json({ erro: "Todos os campos (exceto complemento) são obrigatórios!" });
-            return;
-        }
-
-        const novoEndereco = enderecoRepo.salvar({
-            cliente_id,
-            rua,
-            numero,
-            bairro,
-            cidade,
-            estado,
-            cep,
-            complemento
-        });
-
-        res.status(201).json(novoEndereco);
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
+    if (cliente_id) {
+      const enderecosCliente = repository.buscarPorCliente(parseInt(cliente_id as string));
+      return res.json(enderecosCliente);
     }
-});
 
+    res.json(repository.listar());
+  });
 
-router.get("/enderecos/cliente/:cliente_id", (req: Request, res: Response) => {
+  app.get("/enderecos/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const endereco = repository.buscarPorId(id);
+    if (!endereco) return res.status(404).json({ erro: "Endereço não encontrado" });
+    res.json(endereco);
+  });
+
+  app.post("/enderecos", (req, res) => {
     try {
-        const cliente_id = Number(req.params.cliente_id);
+      const {
+        cliente_id,
+        rua,
+        numero,
+        bairro,
+        cidade,
+        estado,
+        cep,
+        complemento
+      } = req.body;
 
-        if (isNaN(cliente_id)) {
-            res.status(400).json({ erro: "ID do cliente inválido." });
-            return;
-        }
+      if (!cliente_id) throw new Error("ID do cliente é obrigatório");
+      if (!rua || rua.trim().length === 0) {
+        throw new Error("Rua é obrigatória");
+      }
+      if (!numero || numero.trim().length === 0) {
+        throw new Error("Número é obrigatório");
+      }
 
-        const endereco = enderecoRepo.buscarPorClienteId(cliente_id);
+      const endereco = repository.salvar({
+        cliente_id,
+        rua,
+        numero,
+        bairro,
+        cidade,
+        estado,
+        cep,
+        complemento
+      });
 
-        if (endereco) {
-            res.json(endereco);
-        } else {
-            res.status(404).json({ erro: "Nenhum endereço cadastrado para este cliente." });
-        }
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
+      res.status(201).json(endereco);
+    } catch (err) {
+      const mensagem = err instanceof Error ? err.message : "Erro interno";
+      res.status(400).json({ erro: mensagem });
     }
-});
-
-router.put("/enderecos", (req: Request, res: Response) => {
-    try {
-        const { id, cliente_id, rua, numero, bairro, cidade, estado, cep, complemento } = req.body;
-
-        if (!id || !cliente_id) {
-            res.status(400).json({ erro: "ID do endereço e ID do cliente são necessários para atualizar." });
-            return;
-        }
-
-        const sucesso = enderecoRepo.atualizar({
-            id,
-            cliente_id,
-            rua,
-            numero,
-            bairro,
-            cidade,
-            estado,
-            cep,
-            complemento
-        });
-
-        if (sucesso) {
-            res.json({ mensagem: "Endereço atualizado com sucesso!" });
-        } else {
-            res.status(404).json({ erro: "Endereço não encontrado ou dados não alterados." });
-        }
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
-    }
-});
-
-export default router;
+  });
+}

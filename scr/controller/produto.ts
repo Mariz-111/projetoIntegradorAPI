@@ -1,90 +1,52 @@
-import { Router, Request, Response } from "express";
-import { ProdutoRepository } from "../repository/ProdutoRepository";
+import { app } from "../server";
+import { ProdutoRepository } from "../Repositories/Produto";
 
-const router = Router();
-const produtoRepo = new ProdutoRepository();
+export function ProdutoControllers() {
+  const repository = new ProdutoRepository();
 
-router.post("/produtos", (req: Request, res: Response) => {
-    try {
-        const { nome, preco, descricao, estoque } = req.body;
+  app.get("/produtos", (req, res) => {
+    const { nome } = req.query;
 
-        if (!nome || preco === undefined || !descricao || estoque === undefined) {
-            res.status(400).json({ 
-                erro: "Todos os campos (nome, preco, descricao, estoque) são obrigatórios!" 
-            });
-            return;
-        }
-
-        const novoProduto = produtoRepo.salvar({
-            nome,
-            preco: Number(preco),
-            descricao,
-            estoque: Number(estoque)
-        });
-
-        res.status(201).json(novoProduto);
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
+    if (nome) {
+      const produtosFiltrados = repository.buscarPorNome(nome as string);
+      return res.json(produtosFiltrados);
     }
-});
 
-router.get("/produtos", (req: Request, res: Response) => {
+    res.json(repository.listar());
+  });
+
+  app.get("/produtos/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const produto = repository.buscarPorId(id);
+    if (!produto) return res.status(404).json({ erro: "Produto não encontrado" });
+    res.json(produto);
+  });
+
+  app.post("/produtos", (req, res) => {
     try {
-        const produtos = produtoRepo.listar();
-        res.json(produtos);
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
+      const { nome, preco, estoque, descricao } = req.body;
+
+      if (!nome || nome.trim().length === 0) {
+        throw new Error("Nome do produto é obrigatório");
+      }
+      if (preco === undefined || preco <= 0) {
+        throw new Error("Preço deve ser maior que zero");
+      }
+      if (estoque !== undefined && (isNaN(estoque) || estoque < 0)) {
+        throw new Error("Estoque não pode ser negativo");
+      }
+
+      const produto = repository.salvar({
+        nome,
+        preco,
+        estoque: estoque !== undefined ? estoque : 0, 
+        descricao
+      });
+
+      res.status(201).json(produto);
+    } catch (err) {
+      const mensagem = err instanceof Error ? err.message : "Erro interno";
+      res.status(400).json({ erro: mensagem });
     }
-});
-
-router.get("/produtos/:id", (req: Request, res: Response) => {
-    try {
-        const id = Number(req.params.id);
-
-        if (isNaN(id)) {
-            res.status(400).json({ erro: "ID do produto inválido." });
-            return;
-        }
-
-        const produto = produtoRepo.buscarPorId(id);
-
-        if (produto) {
-            res.json(produto);
-        } else {
-            res.status(404).json({ erro: "Produto não encontrado." });
-        }
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
-    }
-});
-
-router.put("/produtos", (req: Request, res: Response) => {
-    try {
-        const { id, nome, preco, descricao, estoque } = req.body;
-
-        if (!id || !nome || preco === undefined || !descricao || estoque === undefined) {
-            res.status(400).json({ 
-                erro: "ID do produto e todos os campos atualizados são obrigatórios!" 
-            });
-            return;
-        }
-
-        const sucesso = produtoRepo.atualizar({
-            id: Number(id),
-            nome,
-            preco: Number(preco),
-            descricao,
-            estoque: Number(estoque)
-        });
-
-        if (sucesso) {
-            res.json({ mensagem: "Produto atualizado com sucesso!" });
-        } else {
-            res.status(404).json({ erro: "Produto não encontrado para atualizar." });
-        }
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
-    }
-});
-
-export default router;
+  });
+}

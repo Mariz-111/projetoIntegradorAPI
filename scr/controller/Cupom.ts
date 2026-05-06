@@ -1,47 +1,41 @@
-import { Router, Request, Response } from "express";
-import { CupomRepository } from "../repository/CupomRepository";
+import { app } from "../server";
+import { CupomRepository } from "../Repositories/Cupom";
 
-const router = Router();
-const cupomRepo = new CupomRepository();
+export function CupomController() {
+  const repository = new CupomRepository();
 
-router.post("/cupons", (req: Request, res: Response) => {
-    try {
-        const { codigo, desconto, validade } = req.body;
+  app.get("/Cupom", (req, res) => {
+    const { codigo } = req.query;
 
-        if (!codigo || !desconto || !validade) {
-            res.status(400).json({ erro: "Todos os campos (codigo, desconto, validade) são obrigatórios!" });
-            return;
-        }
-
-        const novoCupom = cupomRepo.salvar({ codigo, desconto, validade });
-        res.status(201).json(novoCupom);
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
+    if (codigo) {
+      const Cupom = repository.buscarPor(codigo as string);
+      if (!Cupom) return res.status(404).json({ erro: "Código invalido" });
+      return res.json(Cupom);
     }
-});
 
-router.get("/cupons", (req: Request, res: Response) => {
+    res.json(repository.listar());
+  });
+
+  app.get("/Cupom/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const Cupom = repository.buscarPorId(id);
+    if (!Cupom) return res.status(404).json({ erro: "Cupom não encontrado" });
+    res.json(Cupom);
+  });
+
+  app.post("/Cupom", (req, res) => {
     try {
-        const cupons = cupomRepo.listar();
-        res.json(cupons);
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
+      const {codigo, desconto, validade} = req.body;
+
+      if (!codigo || codigo.trim().length === 0) throw new Error("Código é obrigatório");
+      if (!desconto || desconto.trim().length === 0) throw new Error("Desconto valido");
+      if (!validade || validade.trim().length === 0) throw new Error("Validade Vencida");
+
+      const Cupom = repository.salvar({ codigo });
+      res.status(201).json(Cupom);
+    } catch (err) {
+      const mensagem = err instanceof Error ? err.message : "Erro interno";
+      res.status(400).json({ erro: mensagem });
     }
-});
-
-router.get("/cupons/:codigo", (req: Request, res: Response) => {
-    try {
-        const codigo = req.params.codigo as string;
-        const cupom = cupomRepo.buscarPorCodigo(codigo);
-
-        if (cupom) {
-            res.json(cupom);
-        } else {
-            res.status(404).json({ erro: `Cupom '${codigo}' não encontrado ou inválido.` });
-        }
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
-    }
-});
-
-export default router;
+  });
+}

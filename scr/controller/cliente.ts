@@ -1,27 +1,58 @@
-import { Router, Request, Response } from "express";
-import { ClienteRepository } from "../repository/ClienteRepository";
+import { Request, Response } from "express";
+import { app } from "../server";
+import { ClienteRepository } from "../Repositories/Cliente";
 
-const router = Router();
-const clienteRepo = new ClienteRepository();
+export function ClienteControllers() {
+  const repository = new ClienteRepository();
 
-// Cadastrar Cliente (POST /clientes)
-router.post("/clientes", (req: Request, res: Response) => {
-    try {
-        const novoCliente = clienteRepo.salvar(req.body);
-        res.status(201).json(novoCliente);
-    } catch (error: any) {
-        res.status(400).json({ erro: error.message });
+  app.get("/clientes", (req: Request, res: Response) => {
+    const { email } = req.query;
+
+    if (email) {
+      const cliente = repository.buscarPorEmail(email as string);
+      if (!cliente) return res.status(404).json({ erro: "Cliente não encontrado" });
+      return res.json(cliente);
     }
-});
 
-// Listar Clientes (GET /clientes)
-router.get("/clientes", (req: Request, res: Response) => {
+    res.json(repository.listar());
+  });
+
+  app.get("/clientes/:id", (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+    const cliente = repository.buscarPorId(id);
+    if (!cliente) return res.status(404).json({ erro: "Cliente não encontrado" });
+    res.json(cliente);
+  });
+
+  app.post("/clientes", (req: Request, res: Response) => {
     try {
-        const clientes = clienteRepo.listar();
-        res.json(clientes);
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
-    }
-});
+      const { nome, telefone, cpf, email, senha } = req.body;
 
-export default router;
+      if (!nome || nome.trim().length === 0) {
+        throw new Error("Nome é obrigatório");
+      }
+      if (!cpf || cpf.trim().length === 0) {
+        throw new Error("CPF é obrigatório");
+      }
+      if (!email || !email.includes("@")) {
+        throw new Error("Email inválido");
+      }
+      if (!senha || senha.length < 6) {
+        throw new Error("Senha deve ter pelo menos 6 caracteres");
+      }
+
+      const cliente = repository.salvar({
+        nome,
+        telefone,
+        cpf,
+        email,
+        senha
+      });
+
+      res.status(201).json(cliente);
+    } catch (err) {
+      const mensagem = err instanceof Error ? err.message : "Erro interno";
+      res.status(400).json({ erro: mensagem });
+    }
+  });
+}

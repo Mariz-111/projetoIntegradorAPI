@@ -1,84 +1,77 @@
-import { Router, Request, Response } from "express";
-import { CompraRepository } from "../repository/compra";
-import { ProdutoRepository } from "../repository/ProdutoRepository";
+import { app } from "../server";
+import { CompraRepository } from "../Repositories/compra";
 
-const router = Router();
-const compraRepo = new CompraRepository();
-const produtoRepo = new ProdutoRepository();
+export function CompraControllers() {
+  const repository = new CompraRepository();
 
-router.post("/compras", (req: Request, res: Response) => {
-    try {
-        const { cliente_id, metodo_pagamento, frete, cupom_id, quantidade } = req.body;
+  app.get("/compras", (req, res) => {
+    const { cliente_id } = req.query;
 
-        const produtoIdUnico = 1; 
-        const produto = produtoRepo.buscarPorId(produtoIdUnico);
-
-        if (!produto) {
-             res.status(404).json({ erro: "Produto único não encontrado para realizar a venda." });
-             return;
-        }
-
-        if (produto.estoque < quantidade) {
-             res.status(400).json({ 
-                erro: `Estoque insuficiente! Temos apenas ${produto.estoque} unidades disponíveis.` 
-            });
-             return;
-        }
-
-        const subtotal = produto.preco * quantidade;
-
-        const valor_total = subtotal + Number(frete);
-
-        const novaCompra = compraRepo.salvar({
-            cliente_id,
-            produto_id: produtoIdUnico,
-            metodo_pagamento,
-            status_pagamento: "Pendente", 
-            data_pagamento: null,         
-            status_entrega: "Preparando",  
-            frete,
-            cupom_id,
-            quantidade,
-            subtotal,
-            valor_total
-        });
-
-        produtoRepo.baixarEstoque(produtoIdUnico, quantidade);
-
-        res.status(201).json({
-            mensagem: "Compra realizada e estoque atualizado com sucesso!",
-            compra: novaCompra
-        });
-
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
+    if (cliente_id) {
+      const comprasCliente = repository.buscarPorCliente(parseInt(cliente_id as string));
+      return res.json(comprasCliente);
     }
-});
 
-router.get("/compras", (req: Request, res: Response) => {
+    res.json(repository.listar());
+  });
+
+  app.get("/compras/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const compra = repository.buscarPorId(id);
+    if (!compra) return res.status(404).json({ erro: "Compra não encontrada" });
+    res.json(compra);
+  });
+
+  app.post("/compras", (req, res) => {
     try {
-        const compras = compraRepo.listar();
-        res.json(compras);
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
+      const {
+        cliente_id,
+        produto_id,
+        metodo_pagamento,
+        status_pagamento,
+        data_pagamento,
+        status_entrega,
+        frete,
+        cupom_id,
+        quantidade,
+        subtotal,
+        valor_total
+      } = req.body;
+
+      // Validações de campos obrigatórios conforme seu SQL
+      if (!cliente_id) throw new Error("ID do cliente é obrigatório");
+      if (!produto_id) throw new Error("ID do produto é obrigatório");
+      if (!metodo_pagamento || metodo_pagamento.trim().length === 0) {
+        throw new Error("Método de pagamento é obrigatório");
+      }
+      if (!quantidade || quantidade <= 0) {
+        throw new Error("Quantidade deve ser maior que zero");
+      }
+      if (subtotal === undefined || subtotal < 0) {
+        throw new Error("Subtotal inválido");
+      }
+      if (valor_total === undefined || valor_total < 0) {
+        throw new Error("Valor total inválido");
+      }
+
+      const compra = repository.salvar({
+        cliente_id,
+        produto_id,
+        metodo_pagamento,
+        status_pagamento: status_pagamento || "Pendente",
+        data_pagamento,
+        status_entrega: status_entrega || "Em processamento",
+        frete: frete !== undefined ? frete : 0.0,
+        cupom_id,
+        quantidade,
+        subtotal,
+        valor_total
+      });
+
+      res.status(201).json(compra);
+    } catch (err) {
+      const mensagem = err instanceof Error ? err.message : "Erro interno";
+      res.status(400).json({ erro: mensagem });
     }
-});
-
-router.patch("/compras/:id/entrega", (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const { status_entrega } = req.body;
-
-        const sucesso = compraRepo.atualizarEntrega(Number(id), status_entrega);
-
-        if (sucesso) {
-            res.json({ mensagem: `Status de entrega atualizado para: ${status_entrega}` });
-        } else {
-            res.status(404).json({ erro: "Compra não encontrada." });
-        }
-    } catch (error: any) {
-        res.status(500).json({ erro: error.message });
-    }
-});
-
-export default router;
+  });
+}

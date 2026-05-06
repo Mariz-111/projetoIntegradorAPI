@@ -11,7 +11,6 @@ const app = express();
 
 app.use(express.json());
 
-// Registro das rotas
 app.use(clienteRoutes);
 app.use(compraRoutes);
 app.use(cupomRoutes);

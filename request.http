@@ -1,103 +1,67 @@
-# ─── CLIENTES ────────────────────────────────────────────────────────────────
-
-### Criar cliente
-POST http://localhost:3000/clientes
-Content-Type: application/json
-
-{
-  "nome": "Maria",
-  "email": "Maria@email.com"
-}
+### 1. Testar se a API está online
+GET http://localhost:3000/
+Accept: application/json
 
 ###
 
-### Listar todos os clientes
-GET http://localhost:3000/clientes
-
-###
-
-### Buscar cliente por id
-GET http://localhost:3000/clientes/2
-
-###
-
-### Buscar cliente por nome (busca parcial)
-GET http://localhost:3000/clientes?nome=M
-
-###
-
-# ─── PRODUTOS ────────────────────────────────────────────────────────────────
-
-### Criar produto
+### 2. Cadastrar o Produto Único
 POST http://localhost:3000/produtos
 Content-Type: application/json
 
 {
-  "nome": "Tenis azul",
-  "preco": 400,
-  "estoque": 2
+  "nome": "Produto Exclusivo da Loja",
+  "preco": 60.00,
+  "descricao": "Este é o produto único que controlamos o estoque.",
+  "estoque": 10
 }
 
 ###
 
-### Listar todos os produtos
-GET http://localhost:3000/produtos
-
-###
-
-### Buscar produto por id
-GET http://localhost:3000/produtos/2
-
-###
-
-### Buscar produto por nome (busca parcial)
-GET http://localhost:3000/produtos?nome=Tenis azul
-
-###
-
-# ─── VENDAS ──────────────────────────────────────────────────────────────────
-
-### Criar venda com um produto
-POST http://localhost:3000/vendas
+### 3. Cadastrar um Cliente
+POST http://localhost:3000/clientes
 Content-Type: application/json
 
 {
-  "clienteId": 1,
-  "itens": [
-    { "produtoId": 2, "quantidade": 1 }
-  ]
+  "nome": "João Silva",
+  "email": "joao@email.com",
+  "senha": "senha_segura_123"
 }
 
 ###
 
-### Criar venda com múltiplos produtos
-POST http://localhost:3000/vendas
+### 4. Cadastrar um Cupom de Desconto
+POST http://localhost:3000/cupons
 Content-Type: application/json
 
 {
-  "clienteId": 1,
-  "itens": [
-    { "produtoId": 1, "quantidade": 2 },
-    { "produtoId": 89, "quantidade": 1 }
-  ]
+  "codigo": "DESCONTO10",
+  "desconto": 10.00,
+  "validade": "2026-12-31"
 }
 
 ###
 
-### Criar venda com estoque insuficiente (deve retornar erro)
-POST http://localhost:3000/vendas
+### 5. Buscar o Cupom pelo Código (A rota que corrigimos!)
+GET http://localhost:3000/cupons/DESCONTO10
+Accept: application/json
+
+###
+
+### 6. Criar um Pedido (Associando o cliente e o cupom)
+POST http://localhost:3000/pedidos
 Content-Type: application/json
 
 {
-  "clienteId": 1,
-  "itens": [
-    { "produtoId": 1, "quantidade": 9999 }
-  ]
+  "cliente_id": 1,
+  "pagamento_id": 1,
+  "status_pedido": "Pendente",
+  "subtotal": 150.00,
+  "frete": 15.00,
+  "cupom_id": 1
 }
 
 ###
 
-### Listar todas as vendas
-GET http://localhost:3000/vendas
-
-###
+### 7. Listar todos os Pedidos criados
+GET http://localhost:3000/pedidos
+Accept: application/json

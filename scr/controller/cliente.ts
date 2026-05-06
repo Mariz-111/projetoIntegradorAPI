@@ -1,40 +1,27 @@
-import { app } from "../server";
-import { ClienteRepository } from "../repository/clienteRepository";
+import { Router, Request, Response } from "express";
+import { ClienteRepository } from "../repository/ClienteRepository";
 
-export function clienteController() {
-  const repository = new ClienteRepository();
+const router = Router();
+const clienteRepo = new ClienteRepository();
 
-  app.get("/clientes", (req, res) => {
-    const { email } = req.query;
-
-    if (email) {
-      const cliente = repository.buscarPorEmail(email as string);
-      if (!cliente) return res.status(404).json({ erro: "Cliente não encontrado" });
-      return res.json(cliente);
-    }
-
-    res.json(repository.listar());
-  });
-
-  app.get("/clientes/:id", (req, res) => {
-    const id = parseInt(req.params.id);
-    const cliente = repository.buscarPorId(id);
-    if (!cliente) return res.status(404).json({ erro: "Cliente não encontrado" });
-    res.json(cliente);
-  });
-
-  app.post("/clientes", (req, res) => {
+// Cadastrar Cliente (POST /clientes)
+router.post("/clientes", (req: Request, res: Response) => {
     try {
-      const { numero, email } = req.body;
-
-      if (!numero || numero.trim().length === 0) throw new Error("Numero é obrigatório");
-      if (!email || !email.includes("@")) throw new Error("Email inválido");
-
-      const cliente = repository.salvar({ numero, email });
-      res.status(201).json(cliente);
-    } catch (err) {
-      const mensagem = err instanceof Error ? err.message : "Erro interno";
-      res.status(400).json({ erro: mensagem });
+        const novoCliente = clienteRepo.salvar(req.body);
+        res.status(201).json(novoCliente);
+    } catch (error: any) {
+        res.status(400).json({ erro: error.message });
     }
-  });
-}
+});
+
+// Listar Clientes (GET /clientes)
+router.get("/clientes", (req: Request, res: Response) => {
+    try {
+        const clientes = clienteRepo.listar();
+        res.json(clientes);
+    } catch (error: any) {
+        res.status(500).json({ erro: error.message });
+    }
+});
+
+export default router;

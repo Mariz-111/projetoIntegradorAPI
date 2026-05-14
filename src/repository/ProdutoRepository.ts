@@ -25,20 +25,4 @@ export class ProdutoRepository {
         const resultado = db.prepare("SELECT * FROM produto WHERE id = ?").get(id);
         return resultado ? (resultado as Produto) : null;
     }
-
-    atualizar(produto: Produto): boolean {
-        const resultado = db
-            .prepare("UPDATE produto SET nome = ?, preco = ?, descricao = ?, estoque = ? WHERE id = ?")
-            .run(produto.nome, produto.preco, produto.descricao, produto.estoque, produto.id);
-            
-        return resultado.changes > 0;
-    }
-
-    baixarEstoque(produtoId: number, quantidadeVendida: number): boolean {
-        const resultado = db
-            .prepare("UPDATE produto SET estoque = estoque - ? WHERE id = ? AND estoque >= ?")
-            .run(quantidadeVendida, produtoId, quantidadeVendida);
-
-        return resultado.changes > 0;
-    }
 }

@@ -1,5 +1,5 @@
 import { app } from "../server";
-import { CompraRepository } from "../Repositories/compra";
+import { CompraRepository } from "../repository/CompraRepository";
 
 export function CompraControllers() {
   const repository = new CompraRepository();
@@ -38,7 +38,6 @@ export function CompraControllers() {
         valor_total
       } = req.body;
 
-      // Validações de campos obrigatórios conforme seu SQL
       if (!cliente_id) throw new Error("ID do cliente é obrigatório");
       if (!produto_id) throw new Error("ID do produto é obrigatório");
       if (!metodo_pagamento || metodo_pagamento.trim().length === 0) {

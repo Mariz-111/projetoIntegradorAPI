@@ -1,5 +1,5 @@
 import db from "../database/database";
-import { Cliente } from "../models/cliente"; 
+import { Cliente } from "../models/ClienteModels"; 
 
 export class ClienteRepository {
     
@@ -20,6 +20,11 @@ export class ClienteRepository {
 
     listar(): Cliente[] {
         return db.prepare("SELECT * FROM clientes").all() as Cliente[];
+    }
+
+    buscarPorId(id: number): Cliente | null {
+        const resultado = db.prepare("SELECT * FROM cliente WHERE id = ?").get(id);
+        return resultado ? (resultado as Cliente) : null;
     }
 
     buscarPorNome(nome: string): Cliente | null {

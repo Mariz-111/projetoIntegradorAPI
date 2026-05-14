@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { app } from "../server";
-import { ClienteRepository } from "../Repositories/Cliente";
+import { ClienteRepository } from "../repository/ClienteRepository";
 
 export function ClienteControllers() {
   const repository = new ClienteRepository();
@@ -8,7 +8,7 @@ export function ClienteControllers() {
   app.get("/clientes", (req: Request, res: Response) => {
     const { email } = req.query;
 
-    if (email) {
+    if (email) { 
       const cliente = repository.buscarPorEmail(email as string);
       if (!cliente) return res.status(404).json({ erro: "Cliente não encontrado" });
       return res.json(cliente);
@@ -18,7 +18,7 @@ export function ClienteControllers() {
   });
 
   app.get("/clientes/:id", (req: Request, res: Response) => {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.ID as string);
     const cliente = repository.buscarPorId(id);
     if (!cliente) return res.status(404).json({ erro: "Cliente não encontrado" });
     res.json(cliente);
@@ -37,16 +37,12 @@ export function ClienteControllers() {
       if (!email || !email.includes("@")) {
         throw new Error("Email inválido");
       }
-      if (!senha || senha.length < 6) {
-        throw new Error("Senha deve ter pelo menos 6 caracteres");
-      }
 
       const cliente = repository.salvar({
         nome,
         telefone,
         cpf,
-        email,
-        senha
+        email
       });
 
       res.status(201).json(cliente);

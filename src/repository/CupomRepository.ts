@@ -1,5 +1,5 @@
 import db from "../database/database";
-import { Cupom } from "../models/Cupom"; 
+import { Cupom } from "../models/CupomModels"; 
 
 export class CupomRepository {
 
@@ -18,6 +18,11 @@ export class CupomRepository {
 
     listar(): Cupom[] {
         return db.prepare("SELECT * FROM cupom").all() as Cupom[];
+    }
+
+    buscarPorId(id: number): Cupom | null {
+        const resultado = db.prepare("SELECT * FROM cupom WHERE id = ?").get(id);
+        return resultado ? (resultado as Cupom) : null;
     }
 
     buscarPorCodigo(codigo: string): Cupom | null {

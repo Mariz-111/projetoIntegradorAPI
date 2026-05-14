@@ -1,5 +1,5 @@
 import { app } from "../server";
-import { CupomRepository } from "../Repositories/Cupom";
+import { CupomRepository } from "../repository/CupomRepository";
 
 export function CupomController() {
   const repository = new CupomRepository();
@@ -8,7 +8,7 @@ export function CupomController() {
     const { codigo } = req.query;
 
     if (codigo) {
-      const Cupom = repository.buscarPor(codigo as string);
+      const Cupom = repository.buscarPorCodigo(codigo as string);
       if (!Cupom) return res.status(404).json({ erro: "Código invalido" });
       return res.json(Cupom);
     }
@@ -31,7 +31,7 @@ export function CupomController() {
       if (!desconto || desconto.trim().length === 0) throw new Error("Desconto valido");
       if (!validade || validade.trim().length === 0) throw new Error("Validade Vencida");
 
-      const Cupom = repository.salvar({ codigo });
+      const Cupom = repository.salvar({ codigo, desconto, validade });
       res.status(201).json(Cupom);
     } catch (err) {
       const mensagem = err instanceof Error ? err.message : "Erro interno";

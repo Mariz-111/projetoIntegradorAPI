@@ -1,5 +1,5 @@
 import { app } from "../server";
-import { PedidoRepository } from "../Repositories/Pedido";
+import { PedidoRepository } from "../repository/PedidoRepository";
 
 export function PedidoControllers() {
   const repository = new PedidoRepository();

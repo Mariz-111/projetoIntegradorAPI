@@ -1,11 +1,11 @@
 ### 1. Testar se a API está online
-GET http://localhost:3000/
+GET http://localhost:3006/
 Accept: application/json
 
 ###
 
 ### 2. Cadastrar o Produto Único
-POST http://localhost:3000/produtos
+POST http://localhost:3006/produto
 Content-Type: application/json
 
 {
@@ -18,7 +18,7 @@ Content-Type: application/json
 ###
 
 ### 3. Cadastrar um Cliente
-POST http://localhost:3000/clientes
+POST http://localhost:3006/clientes
 Content-Type: application/json
 
 {
@@ -30,7 +30,7 @@ Content-Type: application/json
 ###
 
 ### 4. Cadastrar um Cupom de Desconto
-POST http://localhost:3000/cupons
+POST http://localhost:3006/cupons
 Content-Type: application/json
 
 {
@@ -42,13 +42,13 @@ Content-Type: application/json
 ###
 
 ### 5. Buscar o Cupom pelo Código (A rota que corrigimos!)
-GET http://localhost:3000/cupons/DESCONTO10
+GET http://localhost:3006/cupons/DESCONTO10
 Accept: application/json
 
 ###
 
 ### 6. Criar um Pedido (Associando o cliente e o cupom)
-POST http://localhost:3000/pedidos
+POST http://localhost:3006/pedidos
 Content-Type: application/json
 
 {
@@ -63,5 +63,5 @@ Content-Type: application/json
 ###
 
 ### 7. Listar todos os Pedidos criados
-GET http://localhost:3000/pedidos
+GET http://localhost:3006/pedidos
 Accept: application/json

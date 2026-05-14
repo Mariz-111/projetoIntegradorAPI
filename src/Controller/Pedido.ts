@@ -24,38 +24,16 @@ export function PedidoControllers() {
 
   app.post("/pedidos", (req, res) => {
     try {
-      const {
-        cliente_id,
-        data_pedido,
-        pagamento_id,
-        status_pedido,
-        subtotal,
-        frete
-      } = req.body;
+      const { cliente_id, data_pedido, pagamento_id, status_pedido, subtotal, frete } = req.body;
 
       if (!cliente_id) throw new Error("ID do cliente é obrigatório");
-      if (!data_pedido || data_pedido.trim().length === 0) {
-        throw new Error("Data do pedido é obrigatória");
-      }
+      if (!data_pedido || data_pedido.trim().length === 0) {throw new Error("Data do pedido é obrigatória");}
       if (!pagamento_id) throw new Error("ID da forma de pagamento é obrigatório");
-      if (!status_pedido || status_pedido.trim().length === 0) {
-        throw new Error("Status do pedido é obrigatório");
-      }
-      if (subtotal === undefined || subtotal < 0) {
-        throw new Error("Subtotal inválido");
-      }
-      if (frete === undefined || frete < 0) {
-        throw new Error("Frete inválido");
-      }
+      if (!status_pedido || status_pedido.trim().length === 0) {throw new Error("Status do pedido é obrigatório");}
+      if (!subtotal || subtotal < 0) {throw new Error("Subtotal inválido");}
+      if (!frete || frete < 0) {throw new Error("Frete inválido");}
 
-      const pedido = repository.salvar({
-        cliente_id,
-        data_pedido,
-        pagamento_id,
-        status_pedido,
-        subtotal,
-        frete
-      });
+      const pedido = repository.salvar({ cliente_id, data_pedido, pagamento_id, status_pedido, subtotal, frete });
 
       res.status(201).json(pedido);
     } catch (err) {

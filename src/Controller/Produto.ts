@@ -1,52 +1,44 @@
+import { Request, Response } from "express";
 import { app } from "../server";
-import { ProdutoRepository } from "../Repository/Produto";
+import { ProdutoRepository } from "../repository/ProdutoRepository";
 
 export function ProdutoControllers() {
-  const repository = new ProdutoRepository();
+    const repository = new ProdutoRepository();
 
-  app.get("/produtos", (req, res) => {
-    const { nome } = req.query;
+    app.get("/produtos", (req: Request, res: Response) => {
+        const { nome } = req.query;
 
-    if (nome) {
-      const produtosFiltrados = repository.buscarPorNome(nome as string);
-      return res.json(produtosFiltrados);
-    }
+        if (nome) {
+            const produtosFiltrados = repository.buscarPorNome(String(nome));
+            return res.json(produtosFiltrados);
+        }
 
-    res.json(repository.listar());
-  });
+        return res.json(repository.listar());
+    });
 
-  app.get("/produtos/:id", (req, res) => {
-    const id = parseInt(req.params.id);
-    const produto = repository.buscarPorId(id);
-    if (!produto) return res.status(404).json({ erro: "Produto não encontrado" });
-    res.json(produto);
-  });
+    app.get("/produtos/:id", (req: Request, res: Response) => {
+        const id = Number(req.params.id);
+        const produto = repository.buscarPorId(id);
+        
+        if (!produto) {
+            return res.status(404).json({ erro: "Produto não encontrado" });
+        }
+        return res.json(produto);
+    });
 
-  app.post("/produtos", (req, res) => {
-    try {
-      const { nome, preco, estoque, descricao } = req.body;
+    app.post("/produtos", (req: Request, res: Response) => {
+        try {
+            const { nome, preco, estoque, descricao } = req.body;
 
-      if (!nome || nome.trim().length === 0) {
-        throw new Error("Nome do produto é obrigatório");
-      }
-      if (preco === undefined || preco <= 0) {
-        throw new Error("Preço deve ser maior que zero");
-      }
-      if (estoque !== undefined && (isNaN(estoque) || estoque < 0)) {
-        throw new Error("Estoque não pode ser negativo");
-      }
+            if (!nome || nome.trim().length === 0) {return res.status(400).json({ erro: "Nome do produto é obrigatório" });}
+            if (!preco || preco <= 0) {return res.status(400).json({ erro: "Preço deve ser maior que zero" });}
 
-      const produto = repository.salvar({
-        nome,
-        preco,
-        estoque: estoque !== undefined ? estoque : 0, 
-        descricao
-      });
+            const novoProduto = repository.salvar({ nome, preco, estoque: estoque, descricao });
 
-      res.status(201).json(produto);
-    } catch (err) {
-      const mensagem = err instanceof Error ? err.message : "Erro interno";
-      res.status(400).json({ erro: mensagem });
-    }
-  });
+            return res.status(201).json(novoProduto);
+        } catch (err: any) {
+            const mensagem = err instanceof Error ? err.message : "Erro interno";
+            return res.status(400).json({ erro: mensagem });
+        }
+    });
 }

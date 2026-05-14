@@ -1,10 +1,10 @@
 import express from "express";
-import { Cliente } from "./controller/Cliente";
-import { Compra } from "./controller/Compra";
-import { Endereco } from "./controller/Endereco";
-import { FormaPagamento } from "./Controller/formaPagamento";
-import { Pedido } from "./controller/Pedido";
-import { Produto } from "./controller/Produto";
+import { ClienteControllers } from "./Controller/Cliente";
+import { CompraControllers } from "./Controller/Compra";
+import { EnderecoControllers } from "./Controller/Endereco";
+import { FormaPagamentoControllers } from "./Controller/formapagamento";
+import { PedidoControllers } from "./Controller/Pedido";
+import { ProdutoControllers } from "./Controller/Produto";
 
 const app = express();
 
@@ -12,14 +12,15 @@ app.use(express.json());
 
 export { app };
 
-Cliente();
-Compra();
-Endereco();
-FormaPagamento();
-Pedido();
-Produto();
+ClienteControllers();
+CompraControllers();
+EnderecoControllers();
+FormaPagamentoControllers();
+PedidoControllers();
+ProdutoControllers();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3006;
+
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });

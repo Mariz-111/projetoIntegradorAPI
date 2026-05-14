@@ -26,16 +26,13 @@ export function EnderecoControllers() {
 
     app.post("/enderecos", (req: Request, res: Response) => {
         try {
-            const {
-                cliente_id, rua, numero, bairro, cidade, estado, cep, complemento } = req.body;
+            const { cliente_id, rua, numero, bairro, cidade, estado, cep, complemento } = req.body;
 
             if (!cliente_id) throw new Error("ID do cliente é obrigatório");
             if (!rua || rua.trim().length === 0) throw new Error("Rua é obrigatória");
             if (!numero || numero.trim().length === 0) throw new Error("Número é obrigatório");
 
-            const endereco = repository.salvar({
-                cliente_id, rua, numero, bairro, cidade, estado, cep, complemento
-            });
+            const endereco = repository.salvar({ cliente_id, rua, numero, bairro, cidade, estado, cep, complemento });
 
             res.status(201).json(endereco);
         } catch (err: any) {

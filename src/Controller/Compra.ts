@@ -24,48 +24,16 @@ export function CompraControllers() {
 
   app.post("/compras", (req, res) => {
     try {
-      const {
-        cliente_id,
-        produto_id,
-        metodo_pagamento,
-        status_pagamento,
-        data_pagamento,
-        status_entrega,
-        frete,
-        cupom_id,
-        quantidade,
-        subtotal,
-        valor_total
-      } = req.body;
+      const { cliente_id, produto_id, metodo_pagamento, status_pagamento, data_pagamento, status_entrega, frete, cupom_id, quantidade, subtotal, valor_total } = req.body;
 
-      if (!cliente_id) throw new Error("ID do cliente é obrigatório");
-      if (!produto_id) throw new Error("ID do produto é obrigatório");
-      if (!metodo_pagamento || metodo_pagamento.trim().length === 0) {
-        throw new Error("Método de pagamento é obrigatório");
-      }
-      if (!quantidade || quantidade <= 0) {
-        throw new Error("Quantidade deve ser maior que zero");
-      }
-      if (subtotal === undefined || subtotal < 0) {
-        throw new Error("Subtotal inválido");
-      }
-      if (valor_total === undefined || valor_total < 0) {
-        throw new Error("Valor total inválido");
-      }
+if (!cliente_id) throw new Error("ID do cliente é obrigatório");
+if (!produto_id) throw new Error("ID do produto é obrigatório");
+if (!metodo_pagamento || metodo_pagamento.trim().length === 0) {throw new Error("Método de pagamento é obrigatório");}
+if (!quantidade || quantidade <= 0) {throw new Error("Quantidade deve ser maior que zero")}
+if (!subtotal || subtotal < 0) {throw new Error("Subtotal inválido");}
+if (!valor_total || valor_total < 0) {throw new Error("Valor total inválido");}
 
-      const compra = repository.salvar({
-        cliente_id,
-        produto_id,
-        metodo_pagamento,
-        status_pagamento: status_pagamento || "Pendente",
-        data_pagamento,
-        status_entrega: status_entrega || "Em processamento",
-        frete: frete !== undefined ? frete : 0.0,
-        cupom_id,
-        quantidade,
-        subtotal,
-        valor_total
-      });
+      const compra = repository.salvar({ cliente_id, produto_id, metodo_pagamento, status_pagamento, data_pagamento, status_entrega, frete, cupom_id, quantidade, subtotal, valor_total });
 
       res.status(201).json(compra);
     } catch (err) {

@@ -25,25 +25,13 @@ export function ClienteControllers() {
   });
 
   app.post("/clientes", (req: Request, res: Response) => {
-    try {
-      const { nome, telefone, cpf, email, senha } = req.body;
+    try { const { nome, telefone, cpf, email } = req.body;
 
-      if (!nome || nome.trim().length === 0) {
-        throw new Error("Nome é obrigatório");
-      }
-      if (!cpf || cpf.trim().length === 0) {
-        throw new Error("CPF é obrigatório");
-      }
-      if (!email || !email.includes("@")) {
-        throw new Error("Email inválido");
-      }
+      if (!nome || nome.trim().length === 0) {throw new Error("Nome é obrigatório"); }
+      if (!cpf || cpf.trim().length === 0) {throw new Error("CPF é obrigatório");}
+      if (!email || !email.includes("@")) {throw new Error("Email inválido");}
 
-      const cliente = repository.salvar({
-        nome,
-        telefone,
-        cpf,
-        email
-      });
+      const cliente = repository.salvar({ nome, telefone, cpf, email });
 
       res.status(201).json(cliente);
     } catch (err) {

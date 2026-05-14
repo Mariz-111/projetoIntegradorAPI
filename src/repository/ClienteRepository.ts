@@ -2,7 +2,6 @@ import db from "../database/database";
 import { Cliente } from "../models/ClienteModels"; 
 
 export class ClienteRepository {
-    
     salvar(cliente: Cliente): Cliente {
         const resultado = db
             .prepare("INSERT INTO cliente (nome, telefone, cpf, email) VALUES (?, ?, ?, ?)")

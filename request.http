@@ -9,10 +9,10 @@ POST http://localhost:3006/produto
 Content-Type: application/json
 
 {
-  "nome": "Produto Exclusivo da Loja",
+  "nome": "Belle Spray",
   "preco": 60.00,
-  "descricao": "Este é o produto único que controlamos o estoque.",
-  "estoque": 10
+  "descricao": "Spray para espinhas.",
+  "estoque": 45
 }
 
 ###
@@ -22,9 +22,11 @@ POST http://localhost:3006/clientes
 Content-Type: application/json
 
 {
-  "nome": "João Silva",
-  "email": "joao@email.com",
-  "senha": "senha_segura_123"
+  "nome": "Fernando",
+  "telefone": "13 997097821",
+  "cpf": "123.456.789.00",
+  "email": "feranndo10@gmail.com",
+  "senha": "senha_segura"
 }
 
 ###
@@ -34,29 +36,30 @@ POST http://localhost:3006/cupons
 Content-Type: application/json
 
 {
-  "codigo": "DESCONTO10",
-  "desconto": 10.00,
-  "validade": "2026-12-31"
+  "codigo": "BELLEVISAGE10",
+  "desconto": 20.00,
+  "validade": "2026-07-05"
 }
 
 ###
 
-### 5. Buscar o Cupom pelo Código (A rota que corrigimos!)
+### 5. Buscar o Cupom pelo Código
 GET http://localhost:3006/cupons/DESCONTO10
 Accept: application/json
 
 ###
 
-### 6. Criar um Pedido (Associando o cliente e o cupom)
+### 6. Criar um Pedido
 POST http://localhost:3006/pedidos
 Content-Type: application/json
 
 {
   "cliente_id": 1,
+  "data_pedido": 2026-05-30,
   "pagamento_id": 1,
   "status_pedido": "Pendente",
-  "subtotal": 150.00,
-  "frete": 15.00,
+  "subtotal": 60.00,
+  "frete": 20.00,
   "cupom_id": 1
 }
 

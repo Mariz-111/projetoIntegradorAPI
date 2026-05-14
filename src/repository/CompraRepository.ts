@@ -2,11 +2,9 @@ import db from "../database/database";
 import { Compra } from "../models/CompraModels";
 
 export class CompraRepository {
-
     salvar(compra: Compra): Compra {
         const resultado = db
-            .prepare(`
-                INSERT INTO compra ( cliente_id,  produto_id,  metodo_pagamento,  status_pagamento,  data_pagamento,  status_entrega,  frete,  cupom_id, quantidade,  subtotal, valor_total ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)  `)
+            .prepare(`INSERT INTO compra ( cliente_id,  produto_id,  metodo_pagamento,  status_pagamento,  data_pagamento,  status_entrega,  frete,  cupom_id, quantidade,  subtotal, valor_total ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)  `)
             .run(compra.cliente_id, compra.produto_id, compra.metodo_pagamento, compra.status_pagamento, compra.data_pagamento, compra.status_entrega, compra.frete, compra.cupom_id !== undefined ? compra.cupom_id : null, compra.quantidade, compra.subtotal,  compra.valor_total );
 
         return { 

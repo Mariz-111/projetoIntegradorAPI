@@ -29,7 +29,7 @@ db.exec(`
   descricao TEXT
   );
 
-  CREATE TABLE IF NOT EXIST cupom (
+  CREATE TABLE IF NOT EXISTS cupom (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   codigo VARCHAR(20) UNIQUE,
   desconto DECIMAL(5,2),

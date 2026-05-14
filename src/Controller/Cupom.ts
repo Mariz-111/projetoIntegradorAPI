@@ -19,6 +19,7 @@ export function CupomController() {
   app.get("/Cupom/:id", (req, res) => {
     const id = parseInt(req.params.id);
     const Cupom = repository.buscarPorId(id);
+    
     if (!Cupom) return res.status(404).json({ erro: "Cupom não encontrado" });
     res.json(Cupom);
   });

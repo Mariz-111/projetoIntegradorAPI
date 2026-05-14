@@ -2,7 +2,6 @@ import db from "../database/database";
 import { Cupom } from "../models/CupomModels"; 
 
 export class CupomRepository {
-
     salvar(cupom: Cupom): Cupom {
         const resultado = db
             .prepare("INSERT INTO cupom (codigo, desconto, validade) VALUES (?, ?, ?)")
@@ -29,7 +28,6 @@ export class CupomRepository {
         const resultado = db
             .prepare("SELECT * FROM cupom WHERE codigo = ?")
             .get(codigo);
-            
-        return resultado ? (resultado as Cupom) : null;
+            return resultado ? (resultado as Cupom) : null;
     }
 }

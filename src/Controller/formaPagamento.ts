@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { app } from "../server";
-import { FormaPagamentoRepository } from "../repository/FormaPagamentoRepository";
+import { FormaPagamentoRepository } from "../repository/formaPagamentoRepository";
 
 export function FormaPagamentoControllers() {
     const repository = new FormaPagamentoRepository();
@@ -9,8 +9,8 @@ export function FormaPagamentoControllers() {
         const { tipoPagamento } = req.query;
 
         if (tipoPagamento) {
-            const formasFiltradas = repository.buscarPorTipo(tipoPagamento as string);
-            return res.json(formasFiltradas);
+            const formas = repository.buscarPorTipoPagamento(tipoPagamento as string);
+            return res.json(formas);
         }
 
         res.json(repository.listar());
@@ -18,30 +18,23 @@ export function FormaPagamentoControllers() {
 
     app.get("/formas-pagamento/:id", (req: Request, res: Response) => {
         const id = Number(req.params.id);
-        const formaPagamento = repository.buscarPorId(id);
+        const forma = repository.buscarPorId(id);
         
-        if (!formaPagamento) {
-            return res.status(404).json({ erro: "Forma de pagamento não encontrada" });
-        }
-        res.json(formaPagamento);
+        if (!forma) return res.status(404).json({ erro: "Forma de pagamento não encontrada" });
+        res.json(forma);
     });
 
     app.post("/formas-pagamento", (req: Request, res: Response) => {
         try {
             const { tipoPagamento } = req.body;
 
-            if (!tipoPagamento || tipoPagamento.trim().length === 0) {
-                throw new Error("Tipo de pagamento é obrigatório");
-            }
+            if (!tipoPagamento || tipoPagamento.trim().length === 0) {throw new Error("Tipo de pagamento é obrigatório");}
 
-            const novaForma = repository.salvar({
-                tipoPagamento
-            });
+            const novaForma = repository.salvar({ tipoPagamento });
 
             res.status(201).json(novaForma);
         } catch (err: any) {
-            const mensagem = err instanceof Error ? err.message : "Erro interno";
-            res.status(400).json({ erro: mensagem });
+            res.status(400).json({ erro: err.message || "Erro interno" });
         }
     });
 }

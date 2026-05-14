@@ -3,11 +3,9 @@ import { Pedido } from "../models/PedidoModels";
 
 export class PedidoRepository {
     salvar(pedido: Pedido): Pedido {
-        const resultado = db.prepare(`
-            INSERT INTO pedido (
-                cliente_id, data_pedido, pagamento_id, status_pedido, subtotal, frete, cupom_id ) VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).run(
-            pedido.cliente_id, pedido.data_pedido, pedido.pagamento_id, pedido.status_pedido, pedido.subtotal, pedido.frete, pedido.cupom_id );
+        const resultado = db
+            .prepare(`INSERT INTO pedido (cliente_id, data_pedido, pagamento_id, status_pedido, subtotal, frete, cupom_id ) VALUES (?, ?, ?, ?, ?, ?, ?)`)
+            .run(pedido.cliente_id, pedido.data_pedido, pedido.pagamento_id, pedido.status_pedido, pedido.subtotal, pedido.frete, pedido.cupom_id );
 
         return {
             id: Number(resultado.lastInsertRowid),

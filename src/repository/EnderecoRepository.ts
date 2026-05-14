@@ -3,11 +3,9 @@ import { Endereco } from "../models/EnderecoModels";
 
 export class EnderecoRepository {
     salvar(endereco: Endereco): Endereco {
-        const resultado = db.prepare(`
-            INSERT INTO endereco (
-                cliente_id, rua, numero, bairro, cidade, estado, cep, complemento ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(
-            endereco.cliente_id, endereco.rua, endereco.numero, endereco.bairro, endereco.cidade, endereco.estado, endereco.cep, endereco.complemento );
+        const resultado = db
+            .prepare(` INSERT INTO endereco (cliente_id, rua, numero, bairro, cidade, estado, cep, complemento ) VALUES (?, ?, ?, ?, ?, ?, ?, ?) `)
+            .run( endereco.cliente_id, endereco.rua, endereco.numero, endereco.bairro, endereco.cidade, endereco.estado, endereco.cep, endereco.complemento );
 
         return {
             id: Number(resultado.lastInsertRowid),
